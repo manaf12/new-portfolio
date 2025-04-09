@@ -125,31 +125,18 @@ const WorkExperience = () => {
       <motion.div className="bg-layer-3" style={{ y: y3 }} />
 
       <div className="particles">
-        {[...Array(30)].map((_, i) => {
-          const randomX = Math.random();
-          const randomY = Math.random();
-          return (
-            <motion.div
-              key={i}
-              className="particle"
-              style={{
-                '--random-x': randomX,
-                '--random-y': randomY,
-                left: `${randomX * 100}%`,
-                top: `${randomY * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${Math.random() * 15 + 10}s`
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 0.8, 0] }}
-              transition={{
-                duration: Math.random() * 10 + 5,
-                repeat: Infinity,
-                repeatDelay: Math.random() * 5
-              }}
-            />
-          );
-        })}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${Math.random() * 15 + 10}s`
+            }}
+          />
+        ))}
       </div>
 
       <div className="container">
@@ -160,19 +147,10 @@ const WorkExperience = () => {
           transition={{ duration: 0.6 }}
           viewport={{ once: true, margin: "-50px" }}
         >
-          <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
+          <motion.h2>
             <span className="gradient-text">Professional</span> Journey
           </motion.h2>
-          <motion.p 
-            className="subtitle"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
+          <motion.p className="subtitle">
             Where innovation meets experience
           </motion.p>
           <motion.div 
@@ -180,7 +158,6 @@ const WorkExperience = () => {
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            viewport={{ once: true }}
           />
         </motion.div>
 
@@ -205,12 +182,7 @@ const WorkExperience = () => {
                 aria-label={`View ${company.name} experience`}
               >
                 <span>{company.name}</span>
-                <motion.div 
-                  className="active-indicator"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: activeCompany === index ? 1 : 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                />
+                <motion.div className="active-indicator" />
               </motion.button>
             ))}
           </div>
@@ -230,32 +202,17 @@ const WorkExperience = () => {
               {companies[activeCompany] && (
                 <>
                   <div className="company-header">
-                    <motion.h3
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                    >
+                    <h3>
                       <span>{companies[activeCompany].position}</span>
                       <span className="company-name"> @ {companies[activeCompany].name}</span>
-                    </motion.h3>
-                    <motion.p 
-                      className="period"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                    >
+                    </h3>
+                    <p className="period">
                       {companies[activeCompany].period}
-                    </motion.p>
+                    </p>
                   </div>
 
                   <div className="achievements">
-                    <motion.h4
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      Key Achievements:
-                    </motion.h4>
+                    <h4>Key Achievements:</h4>
                     <ul>
                       {companies[activeCompany].achievements.map((item, i) => (
                         <motion.li
@@ -272,13 +229,7 @@ const WorkExperience = () => {
                   </div>
 
                   <div className="tech-stack">
-                    <motion.h4
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                    >
-                      Technologies Used:
-                    </motion.h4>
+                    <h4>Technologies Used:</h4>
                     <div className="tech-tags">
                       {companies[activeCompany].techStack.map((tech, i) => (
                         <motion.span
@@ -286,10 +237,6 @@ const WorkExperience = () => {
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.05 * i + 0.6 }}
-                          whileHover={{ 
-                            y: -3,
-                            boxShadow: `0 5px 15px ${companies[activeCompany].color}40`
-                          }}
                         >
                           {tech}
                         </motion.span>

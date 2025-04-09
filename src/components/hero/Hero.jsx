@@ -325,44 +325,6 @@ const Hero = () => {
           </motion.div>
         </div>
       </div>
-
-      <div className="tech-signature">
-        {["REACT", "TYPESCRIPT", "FRAMER", "NODE", "FIGMA", "GSAP", "THREE.JS", "WEBGL"].map((tech, i) => (
-          <motion.span 
-            key={i}
-            initial={{ 
-              x: i % 2 === 0 ? -100 : 100, 
-              opacity: 0,
-              rotate: i % 2 === 0 ? -10 : 10
-            }}
-            animate={{ 
-              x: 0, 
-              opacity: 1,
-              rotate: 0,
-              transition: { 
-                duration: 0.8, 
-                delay: i * 0.15 + 1.5,
-                type: "spring",
-                stiffness: 200,
-                damping: 15
-              }
-            }}
-            whileHover={{
-              scale: 1.2,
-              color: "#7b4dff",
-              y: -8,
-              textShadow: "0 5px 15px rgba(123, 77, 255, 0.5)",
-              background: "rgba(123, 77, 255, 0.1)",
-              borderColor: "rgba(123, 77, 255, 0.3)"
-            }}
-          >
-            {tech}
-            <span className="tech-glow"></span>
-          </motion.span>
-        ))}
-      </div>
-
-     
     </section>
   );
 };
