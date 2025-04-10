@@ -1,6 +1,6 @@
-import { useRef } from "react";
+import { useRef , useMemo } from "react";
 import "./services.scss";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 
 const services = [
   {
@@ -9,7 +9,7 @@ const services = [
     icon: "💻",
     color: "#7b4dff",
     gradient: "linear-gradient(135deg, #7b4dff 0%, #6200ea 100%)",
-    particles: 15
+    particles: 12 // Reduced from 15
   },
   {
     title: "AI & Machine Learning",
@@ -17,7 +17,7 @@ const services = [
     icon: "🤖",
     color: "#00c6ff",
     gradient: "linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)",
-    particles: 12
+    particles: 10 // Reduced from 12
   },
   {
     title: "Social Media Management",
@@ -25,16 +25,16 @@ const services = [
     icon: "📱",
     color: "#ff4d8d",
     gradient: "linear-gradient(135deg, #ff4d8d 0%, #ff0058 100%)",
-    particles: 10
+    particles: 8 // Reduced from 10
   },
 ];
 
 const variants = {
   initial: { 
-    y: 80,
+    y: 60, // Reduced from 80
     opacity: 0,
-    rotateX: 15,
-    scale: 0.95
+    rotateX: 10, // Reduced from 15
+    scale: 0.97 // Reduced from 0.95
   },
   animate: (index) => ({
     y: 0,
@@ -43,35 +43,40 @@ const variants = {
     scale: 1,
     transition: { 
       type: "spring",
-      stiffness: 100,
-      damping: 15,
-      delay: index * 0.15,
-      duration: 0.8
+      stiffness: 80, // Reduced from 100
+      damping: 12, // Reduced from 15
+      delay: index * 0.12, // Reduced from 0.15
+      duration: 0.6 // Reduced from 0.8
     }
   }),
   hover: {
-    y: -10,
-    scale: 1.02,
+    y: -8, // Reduced from -10
+    scale: 1.01, // Reduced from 1.02
     transition: {
       type: "spring",
-      stiffness: 400,
-      damping: 10
+      stiffness: 300, // Reduced from 400
+      damping: 8 // Reduced from 10
     }
   }
 };
 
 const Services = () => {
   const ref = useRef();
-  const isInView = useInView(ref, { margin: "-100px", once: true });
+  const isInView = useInView(ref, { margin: "-50px", once: true }); 
   
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"]
-  });
-
-  const y1 = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const y2 = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const y3 = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
+  const particleStyles = useMemo(() => 
+    services.map(service => 
+      Array.from({ length: service.particles }, () => ({
+        '--particle-size': `${Math.random() * 5 + 3}px`,
+        '--particle-opacity': `${Math.random() * 0.3 + 0.1}`,
+        '--particle-delay': `${Math.random() * 1.5}s`,
+        '--particle-duration': `${Math.random() * 2 + 1.5}s`,
+        '--particle-x': `${Math.random() * 100}%`,
+        '--particle-y': `${Math.random() * 100}%`
+      }))
+    ),
+    []
+  );
 
   return (
     <motion.section 
@@ -79,29 +84,14 @@ const Services = () => {
       ref={ref}
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : {}}
-      transition={{ duration: 0.8 }}
+      transition={{ duration: 0.6 }} 
     >
-      <div className="elite-bg">
-        <motion.div 
-          className="quantum-dots" 
-          style={{ y: y1 }}
-        />
-        <motion.div 
-          className="holographic-grid" 
-          style={{ y: y2 }}
-        />
-        <motion.div 
-          className="floating-spheres" 
-          style={{ y: y3 }}
-        />
-      </div>
-
       <div className="headerSection">
         <motion.div 
           className="textContainer"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }} 
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.15 }} 
         >
           <p>
             Transforming visions into <span className="highlight-text">digital experiences</span>
@@ -111,7 +101,7 @@ const Services = () => {
             className="divider"
             initial={{ scaleX: 0 }}
             animate={isInView ? { scaleX: 1 } : {}}
-            transition={{ delay: 0.4, duration: 0.8 }}
+            transition={{ delay: 0.3, duration: 0.6 }} 
           />
         </motion.div>
 
@@ -119,13 +109,13 @@ const Services = () => {
           className="titleContainer"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.45 }}
         >
           <div className="title">
             <motion.h1
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -40 }} 
               animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ delay: 0.8 }}
+              transition={{ delay: 0.6 }} 
             >
               <motion.span 
                 className="highlight" 
@@ -138,9 +128,9 @@ const Services = () => {
           </div>
           <div className="title">
             <motion.h1
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 40 }} 
               animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ delay: 1 }}
+              transition={{ delay: 0.75 }}
             >
               <motion.span 
                 className="highlight" 
@@ -158,7 +148,7 @@ const Services = () => {
         className="listContainer"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
-        transition={{ delay: 1.2 }}
+        transition={{ delay: 0.9 }} 
       >
         {services.map((service, index) => (
           <motion.div 
@@ -168,7 +158,7 @@ const Services = () => {
             initial="initial"
             whileInView="animate"
             whileHover="hover"
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, margin: "-30px" }} 
             custom={index}
             style={{ 
               '--card-color': service.color,
@@ -176,19 +166,11 @@ const Services = () => {
             }}
           >
             <div className="particles">
-              {[...Array(service.particles)].map((_, i) => (
+              {particleStyles[index].map((style, i) => (
                 <div 
                   key={i}
                   className="particle"
-                  style={{
-                    // 'particles': `Math.floor(window.innerWidth > 768 ? 15 : 8)`
-                    '--particle-size': `${Math.random() * 6 + 4}px`,
-                    '--particle-opacity': `${Math.random() * 0.4 + 0.2}`,
-                    '--particle-delay': `${Math.random() * 2}s`,
-                    '--particle-duration': `${Math.random() * 3 + 2}s`,
-                    '--particle-x': `${Math.random() * 100}%`,
-                    '--particle-y': `${Math.random() * 100}%`
-                  }}
+                  style={style}
                 />
               ))}
             </div>
@@ -203,7 +185,7 @@ const Services = () => {
                 className="hoverEffect"
                 initial={{ scaleX: 0 }}
                 whileHover={{ scaleX: 1 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.4 }}
               />
             </div>
             <div className="cardReflection" />
