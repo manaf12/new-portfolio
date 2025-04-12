@@ -287,7 +287,7 @@ const Hero = () => {
               opacity: 1,
               y: 0,
               transition: { 
-                delay: 20,
+                delay: 1,
                 ease: [0.16, 1, 0.3, 1]
               }
             }}
