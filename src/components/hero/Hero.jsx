@@ -287,7 +287,7 @@ const Hero = () => {
               opacity: 1,
               y: 0,
               transition: { 
-                delay: 1.5, // Reduced from 1.8
+                delay: 20,
                 ease: [0.16, 1, 0.3, 1]
               }
             }}
@@ -298,12 +298,12 @@ const Hero = () => {
 
           <motion.div 
             className="buttons"
-            initial={{ opacity: 0, y: 15 }} // Reduced from y:20
+            initial={{ opacity: 0, y: 15 }} 
             animate={{ 
               opacity: 1,
               y: 0,
               transition: { 
-                delay: 1.8, // Reduced from 2.1
+                delay: 1.5, 
                 ease: [0.16, 1, 0.3, 1]
               }
             }}
@@ -311,7 +311,7 @@ const Hero = () => {
             <motion.button
               variants={buttonVariants}
               initial="initial"
-              animate={{ y: 0, opacity: 1, transition: { delay: 2.0 } }} // Reduced from 2.3
+              animate={{ y: 0, opacity: 1, transition: { delay: 1.4 } }} 
               whileHover="hover"
               whileTap="tap"
               className="portfolio-btn"
@@ -324,7 +324,7 @@ const Hero = () => {
             <motion.button
               variants={buttonVariants}
               initial="initial"
-              animate={{ y: 0, opacity: 1, transition: { delay: 2.1 } }} // Reduced from 2.4
+              animate={{ y: 0, opacity: 1, transition: { delay: 1.5 } }} 
               whileHover="hover"
               whileTap="tap"
               className="contact-btn"
