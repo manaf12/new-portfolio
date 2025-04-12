@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import "./portfolio.scss";
 
 const Portfolio = () => {
@@ -9,6 +9,7 @@ const Portfolio = () => {
   const containerRef = useRef(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const prefersReducedMotion = useReducedMotion();
 
   // Projects data
   const projects = useMemo(() => [
@@ -48,15 +49,25 @@ const Portfolio = () => {
     },
   ], []);
 
-  // Mobile detection
+  // Mobile detection with debounce
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
+    
+    const debouncedResize = debounce(checkIfMobile, 200);
     checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
-    return () => window.removeEventListener('resize', checkIfMobile);
+    window.addEventListener('resize', debouncedResize);
+    return () => window.removeEventListener('resize', debouncedResize);
   }, []);
+
+  const debounce = (func, wait) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  };
 
   // Handle touch events for mobile swipe
   const handleTouchStart = (e) => {
@@ -68,25 +79,28 @@ const Portfolio = () => {
   };
 
   const handleTouchEnd = () => {
-    if (touchStartX.current - touchEndX.current > 50) {
-      // Swipe left
-      setActiveIndex(prev => Math.min(projects.length - 1, prev + 1));
-    }
-
-    if (touchStartX.current - touchEndX.current < -50) {
-      // Swipe right
-      setActiveIndex(prev => Math.max(0, prev - 1));
+    const threshold = 50;
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    
+    if (Math.abs(swipeDistance) > threshold) {
+      setActiveIndex(prev => {
+        const direction = swipeDistance > 0 ? 1 : -1;
+        return Math.min(Math.max(0, prev + direction), projects.length - 1);
+      });
     }
   };
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e) => {
-    if (e.key === "ArrowLeft") {
-      setActiveIndex(prev => Math.max(0, prev - 1));
-    } else if (e.key === "ArrowRight") {
-      setActiveIndex(prev => Math.min(projects.length - 1, prev + 1));
-    } else if (e.key === "Escape" && selectedId) {
-      setSelectedId(null);
+    const keyActions = {
+      ArrowLeft: () => setActiveIndex(prev => Math.max(0, prev - 1)),
+      ArrowRight: () => setActiveIndex(prev => Math.min(projects.length - 1, prev + 1)),
+      Escape: () => selectedId && setSelectedId(null)
+    };
+    
+    if (keyActions[e.key]) {
+      e.preventDefault();
+      keyActions[e.key]();
     }
   }, [selectedId, projects.length]);
 
@@ -110,7 +124,7 @@ const Portfolio = () => {
   }, [activeIndex]);
 
   // Card animations
-  const cardVariants = {
+  const cardVariants = prefersReducedMotion ? {} : {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
@@ -124,14 +138,24 @@ const Portfolio = () => {
   };
 
   // Modal animations
-  const modalVariants = {
-    hidden: { opacity: 0, y: 20 },
+  const modalVariants = prefersReducedMotion ? {} : {
+    hidden: { opacity: 0, y: isMobile ? '100%' : 20 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.3 }
+      transition: { 
+        duration: 0.4,
+        ease: [0.16, 1, 0.3, 1]
+      }
     },
-    exit: { opacity: 0, y: 20 }
+    exit: { 
+      opacity: 0, 
+      y: isMobile ? '100%' : 20,
+      transition: { 
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
   };
 
   // Keyboard event listener
@@ -141,7 +165,7 @@ const Portfolio = () => {
   }, [handleKeyDown]);
 
   return (
-    <section className="portfolio">
+    <section className="portfolio" id="portfolio">
       <div className="portfolio-header">
         <h2>
           My <span className="highlight">Projects</span>
@@ -176,6 +200,8 @@ const Portfolio = () => {
                   alt={project.title}
                   loading="lazy"
                   decoding="async"
+                  width="300"
+                  height="180"
                 />
               </div>
               
@@ -196,24 +222,28 @@ const Portfolio = () => {
 
         {!isMobile && (
           <>
-            <button 
+            <motion.button 
               className="carousel-nav prev"
               onClick={() => setActiveIndex(prev => Math.max(0, prev - 1))}
               disabled={activeIndex === 0}
+              whileTap={{ scale: 0.9 }}
+              aria-label="Previous project"
             >
-              <svg viewBox="0 0 24 24">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
               </svg>
-            </button>
-            <button 
+            </motion.button>
+            <motion.button 
               className="carousel-nav next"
               onClick={() => setActiveIndex(prev => Math.min(projects.length - 1, prev + 1))}
               disabled={activeIndex === projects.length - 1}
+              whileTap={{ scale: 0.9 }}
+              aria-label="Next project"
             >
-              <svg viewBox="0 0 24 24">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
               </svg>
-            </button>
+            </motion.button>
           </>
         )}
       </div>
@@ -221,7 +251,12 @@ const Portfolio = () => {
       <AnimatePresence>
         {selectedId && (
           <div className="project-modal" onClick={() => setSelectedId(null)}>
-            <div className="modal-backdrop" />
+            <motion.div 
+              className="modal-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
             
             {projects.map(project => (
               project.id === selectedId && (
@@ -233,36 +268,45 @@ const Portfolio = () => {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="modal-title"
                 >
-                  <button 
+                  <motion.button 
                     className="close-btn" 
                     onClick={() => setSelectedId(null)}
                     aria-label="Close modal"
+                    whileTap={{ scale: 0.9 }}
                   >
                     <svg viewBox="0 0 24 24">
                       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                     </svg>
-                  </button>
+                  </motion.button>
 
                   <div className="modal-grid">
-                    {!isMobile && (
-                      <div className="modal-image">
-                        <img 
-                          src={project.img} 
-                          alt={project.title} 
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
+                    <div className="modal-image">
+                      <img 
+                        src={project.img} 
+                        alt={project.title} 
+                        loading="lazy"
+                        width="400"
+                        height="300"
+                      />
+                    </div>
 
                     <div className="modal-details">
-                      <h2>{project.title}</h2>
+                      <h2 id="modal-title">{project.title}</h2>
                       
                       <div className="tech-stack">
                         <h4>Tech Stack</h4>
                         <div className="tech-tags">
                           {project.technologies.map(tech => (
-                            <span key={tech}>{tech}</span>
+                            <motion.span 
+                              key={tech}
+                              whileHover={!isMobile ? { y: -2 } : {}}
+                            >
+                              {tech}
+                            </motion.span>
                           ))}
                         </div>
                       </div>
@@ -275,29 +319,31 @@ const Portfolio = () => {
                       </div>
 
                       <div className="project-links">
-                        <a 
+                        <motion.a 
                           href={project.github} 
                           className="project-link github"
                           target="_blank" 
                           rel="noopener noreferrer"
+                          whileTap={{ scale: 0.95 }}
                         >
                           <svg viewBox="0 0 24 24">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                           </svg>
                           View Code
-                        </a>
+                        </motion.a>
                         {project.live && (
-                          <a 
+                          <motion.a 
                             href={project.live} 
                             className="project-link live"
                             target="_blank" 
                             rel="noopener noreferrer"
+                            whileTap={{ scale: 0.95 }}
                           >
                             <svg viewBox="0 0 24 24">
                               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
                             </svg>
                             Live Demo
-                          </a>
+                          </motion.a>
                         )}
                       </div>
                     </div>
