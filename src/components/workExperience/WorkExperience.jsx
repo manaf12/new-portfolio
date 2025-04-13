@@ -96,68 +96,140 @@ const WorkExperience = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
+  
     const ctx = canvas.getContext('2d');
     let animationFrameId;
     let connections = [];
-
+    let lastTime = 0;
+    const fps = 30;
+    const frameInterval = 1000 / fps;
+  
+    // Connection line class
+    class Connection {
+      constructor(canvasWidth, canvasHeight, color, accentColor) {
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.color = color;
+        this.accentColor = accentColor;
+        this.reset();
+      }
+  
+      reset() {
+        this.x1 = Math.random() * this.canvasWidth;
+        this.y1 = Math.random() * this.canvasHeight;
+        this.x2 = Math.random() * this.canvasWidth;
+        this.y2 = Math.random() * this.canvasHeight;
+        this.speed = 0.1 + Math.random() * 0.3;
+        this.progress = Math.random();
+        this.goingForward = Math.random() > 0.5;
+        this.width = 0.2 + Math.random() * 0.3;
+        this.alpha = 0.05 + Math.random() * 0.1;
+        this.useAccentColor = Math.random() > 0.7;
+      }
+  
+      update() {
+        if (this.goingForward) {
+          this.progress += this.speed / 100;
+          if (this.progress >= 1) this.goingForward = false;
+        } else {
+          this.progress -= this.speed / 100;
+          if (this.progress <= 0) this.goingForward = true;
+        }
+  
+        // Occasionally reset the line for variety
+        if (Math.random() < 0.002) {
+          this.reset();
+        }
+      }
+  
+      draw(ctx) {
+        const x = this.x1 + (this.x2 - this.x1) * this.progress;
+        const y = this.y1 + (this.y2 - this.y1) * this.progress;
+  
+        // Create gradient for the line
+        const gradient = ctx.createLinearGradient(this.x1, this.y1, x, y);
+        gradient.addColorStop(0, this.useAccentColor ? this.accentColor : this.color);
+        gradient.addColorStop(1, 'transparent');
+  
+        ctx.beginPath();
+        ctx.moveTo(this.x1, this.y1);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = this.width;
+        ctx.globalAlpha = this.alpha;
+        ctx.stroke();
+      }
+    }
+  
     // Initialize connections
     const initConnections = () => {
       connections = [];
-      const count = 10; // Reduced number of connections
+      const count = 12; // Optimal number for performance
+      const color = companies[activeCompany].color;
+      const accentColor = companies[activeCompany].accentColor;
+      
       for (let i = 0; i < count; i++) {
-        connections.push({
-          x1: Math.random() * canvas.width,
-          y1: Math.random() * canvas.height,
-          x2: Math.random() * canvas.width,
-          y2: Math.random() * canvas.height,
-          speed: 0.2 + Math.random() * 0.5,
-          progress: Math.random(),
-          goingForward: Math.random() > 0.5
-        });
+        connections.push(new Connection(canvas.width, canvas.height, color, accentColor));
       }
     };
-
+  
     const resizeCanvas = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
       initConnections();
     };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = companies[activeCompany].color;
-      ctx.lineWidth = 0.3;
-      ctx.globalAlpha = 0.15;
-
-      connections.forEach(conn => {
-        // Update progress
-        if (conn.goingForward) {
-          conn.progress += conn.speed / 100;
-          if (conn.progress >= 1) conn.goingForward = false;
-        } else {
-          conn.progress -= conn.speed / 100;
-          if (conn.progress <= 0) conn.goingForward = true;
+  
+    const draw = (timestamp) => {
+      if (!lastTime) lastTime = timestamp;
+      const deltaTime = timestamp - lastTime;
+  
+      if (deltaTime > frameInterval) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw a subtle grid first
+        ctx.strokeStyle = companies[activeCompany].color;
+        ctx.lineWidth = 0.1;
+        ctx.globalAlpha = 0.03;
+        const gridSize = 40;
+        
+        // Vertical lines
+        for (let x = 0; x < canvas.width; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
         }
-
-        // Draw line
-        ctx.beginPath();
-        const x = conn.x1 + (conn.x2 - conn.x1) * conn.progress;
-        const y = conn.y1 + (conn.y2 - conn.y1) * conn.progress;
-        ctx.moveTo(conn.x1, conn.y1);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-      });
-
+        
+        // Horizontal lines
+        for (let y = 0; y < canvas.height; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+  
+        // Update and draw connections
+        connections.forEach(conn => {
+          conn.update();
+          conn.draw(ctx);
+        });
+  
+        lastTime = timestamp - (deltaTime % frameInterval);
+      }
+  
       animationFrameId = requestAnimationFrame(draw);
     };
-
+  
+    // Initialize
     resizeCanvas();
-    const resizeObserver = new ResizeObserver(resizeCanvas);
+    const resizeObserver = new ResizeObserver(() => {
+      resizeCanvas();
+    });
     resizeObserver.observe(canvas);
-
-    draw();
-
+  
+    // Start animation
+    animationFrameId = requestAnimationFrame(draw);
+  
     return () => {
       cancelAnimationFrame(animationFrameId);
       resizeObserver.disconnect();
@@ -324,6 +396,10 @@ const WorkExperience = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
+              style={{
+                '--company-color': companies[activeCompany]?.color,
+                '--company-accent': companies[activeCompany]?.accentColor
+              }}
             >
               {companies[activeCompany] && (
                 <>
