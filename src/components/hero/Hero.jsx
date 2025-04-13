@@ -42,7 +42,7 @@ const Hero = () => {
     masterAnimation();
   }, [controls]);
 
-  // Mouse parallax effect - optimized with throttling and reduced movement
+  // Mouse parallax effect
   const handleMouseMove = useCallback((e) => {
     if (heroRef.current) {
       const { left, top, width, height } = heroRef.current.getBoundingClientRect();
@@ -50,7 +50,7 @@ const Hero = () => {
       const y = (e.clientY - top) / height;
       
       controls.start({
-        x: (x - 0.5) * 10, // Reduced from 20 to 10
+        x: (x - 0.5) * 10,
         y: (y - 0.5) * 10,
         transition: { type: "spring", stiffness: 100, damping: 10 }
       });
@@ -63,30 +63,30 @@ const Hero = () => {
     return () => window.removeEventListener('mousemove', throttledMouseMove);
   }, [handleMouseMove]);
 
-  // Text animation variants - optimized durations
+  // Text animation variants
   const textVariants = {
     hidden: { 
       opacity: 0, 
-      y: 20, // Reduced from 40
-      filter: "blur(2px)" // Reduced from 4px
+      y: 20,
+      filter: "blur(2px)"
     },
     visible: {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
       transition: {
-        staggerChildren: 0.05, // Reduced from 0.07
-        delayChildren: 0.3, // Reduced from 0.4
+        staggerChildren: 0.05,
+        delayChildren: 0.3,
         ease: [0.16, 1, 0.3, 1]
       }
     }
   };
 
-  // Character animation - optimized durations
+  // Character animation
   const charVariants = {
     hidden: { 
       opacity: 0, 
-      y: 15, // Reduced from 30
+      y: 15,
       textShadow: "0 0 0px rgba(255,255,255,0)"
     },
     visible: {
@@ -94,32 +94,32 @@ const Hero = () => {
       y: 0,
       textShadow: [
         "0 0 0px rgba(255,255,255,0)",
-        "0 0 8px currentColor", // Reduced from 12px
+        "0 0 8px currentColor",
         "0 0 0px rgba(255,255,255,0)"
       ],
       transition: { 
-        duration: 1.2, // Reduced from 1.8
+        duration: 1.2,
         textShadow: { 
-          duration: 3, // Reduced from 4
+          duration: 3,
           repeat: Infinity,
           repeatType: "reverse"
         }
       }
     },
     hover: {
-      y: -4, // Reduced from -5
+      y: -4,
       color: "#7b4dff",
-      transition: { type: "spring", stiffness: 400, damping: 10 } // Reduced stiffness
+      transition: { type: "spring", stiffness: 400, damping: 10 }
     }
   };
 
-  // Photo animation - optimized
+  // Photo animation
   const photoVariants = {
     hidden: { 
-      scale: 0.95, // Reduced from 0.9
+      scale: 0.95,
       opacity: 0,
-      rotateY: 10, // Reduced from 15
-      rotateX: 3 // Reduced from 5
+      rotateY: 10,
+      rotateX: 3
     },
     visible: {
       scale: 1,
@@ -127,71 +127,100 @@ const Hero = () => {
       rotateY: 0,
       rotateX: 0,
       transition: {
-        duration: 1, // Reduced from 1.2
+        duration: 1,
         ease: [0.16, 1, 0.3, 1]
       }
     },
     hover: {
-      scale: 1.02, // Reduced from 1.03
-      rotateY: 3, // Reduced from 5
-      rotateX: 1, // Reduced from 2
-      boxShadow: "0 20px 40px -10px rgba(98, 0, 234, 0.3)", // Reduced shadow
+      scale: 1.02,
+      rotateY: 3,
+      rotateX: 1,
+      boxShadow: "0 20px 40px -10px rgba(98, 0, 234, 0.3)",
       transition: { 
         type: "spring",
-        stiffness: 200, // Reduced from 300
+        stiffness: 200,
         damping: 10
       }
     }
   };
 
-  // Button animation - optimized
+  // Button animation
   const buttonVariants = {
     initial: { 
       y: 10,
       opacity: 0 
     },
     hover: {
-      y: -5, // Reduced from -6
-      boxShadow: "0 15px 30px -8px rgba(98, 0, 234, 0.3)", // Reduced shadow
+      y: -5,
+      boxShadow: "0 15px 30px -8px rgba(98, 0, 234, 0.3)",
       transition: { 
         type: "spring",
-        stiffness: 400, // Reduced from 500
-        damping: 12 // Reduced from 15
+        stiffness: 400,
+        damping: 12
       }
     },
     tap: { 
       scale: 0.96,
-      boxShadow: "0 8px 15px -5px rgba(98, 0, 234, 0.25)" // Reduced shadow
+      boxShadow: "0 8px 15px -5px rgba(98, 0, 234, 0.25)"
     }
   };
 
-  // Floating elements - optimized
+  // Floating elements
   const floatingElements = [
-    { id: 1, size: 100, x: 10, y: 20, delay: 0.1, duration: 12 }, // Reduced size and duration
-    { id: 2, size: 70, x: 80, y: 60, delay: 0.3, duration: 16 }, // Reduced size and duration
-    { id: 3, size: 50, x: 30, y: 80, delay: 0.5, duration: 20 }, // Reduced size and duration
-    { id: 4, size: 80, x: 70, y: 30, delay: 0.7, duration: 15 }  // Reduced size and duration
+    { id: 1, size: 100, x: 10, y: 20, delay: 0.1, duration: 12 },
+    { id: 2, size: 70, x: 80, y: 60, delay: 0.3, duration: 16 },
+    { id: 3, size: 50, x: 30, y: 80, delay: 0.5, duration: 20 },
+    { id: 4, size: 80, x: 70, y: 30, delay: 0.7, duration: 15 }
   ];
 
   return (
     <section className="hero" ref={heroRef}>
-      {/* Optimized Background Elements */}
+      {/* Enhanced Background Elements */}
       <motion.div 
         className="elite-bg"
         initial={{ opacity: 0 }}
         animate={controls}
         variants={{
           visible: {
-            opacity: 1,
-            transition: { duration: 1.2 } // Reduced from 1.5
+            opacity: 5,
+            transition: { duration: 1.2 }
           }
         }}
       >
+        {/* Parallax layers */}
+        <motion.div 
+          className="parallax-layer deep-layer"
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: 0.8,
+            transition: { duration: 1.5 }
+          }}
+        />
+        
+        <motion.div 
+          className="parallax-layer mid-layer"
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: 0.6,
+            transition: { duration: 1.5, delay: 0.3 }
+          }}
+        />
+        
         <div className="quantum-dots"></div>
         <div className="holographic-grid"></div>
         <div className="neon-lines"></div>
         
-        {/* Optimized Floating elements */}
+        {/* Interactive cursor effect */}
+        <motion.div 
+          className="interactive-cursor-effect"
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: 1,
+            transition: { duration: 1 }
+          }}
+        />
+        
+        {/* Floating elements */}
         {floatingElements.map((element) => (
           <motion.div
             key={element.id}
@@ -203,7 +232,7 @@ const Hero = () => {
               rotate: 0
             }}
             animate={{
-              opacity: [0.15, 0.3, 0.15], // Reduced opacity range
+              opacity: [0.15, 0.3, 0.2],
               rotate: 360,
               transition: {
                 opacity: { 
@@ -217,14 +246,6 @@ const Hero = () => {
                   ease: "linear" 
                 }
               }
-            }}
-            style={{
-              width: element.size,
-              height: element.size,
-              borderRadius: '50%',
-              background: `radial-gradient(circle, rgba(123, 77, 255, 0.12) 0%, transparent 70%)`, // Reduced opacity
-              position: 'absolute',
-              filter: 'blur(15px)' // Reduced from 20px
             }}
           />
         ))}
@@ -253,7 +274,7 @@ const Hero = () => {
                 whileHover="hover"
                 style={{ 
                   color: "#ffffff",
-                  transitionDelay: `${i * 0.04}s`, // Reduced from 0.05s
+                  transitionDelay: `${i * 0.04}s`,
                   display: 'inline-block'
                 }}
               >
@@ -270,8 +291,8 @@ const Hero = () => {
                 whileHover="hover"
                 className={char === " " ? "space" : ""}
                 style={{
-                  color: i < 12 ? "#7b4dff" : "#ff4d8d",
-                  transitionDelay: `${i * 0.04 + 0.4}s`, // Reduced from 0.05s + 0.5s
+                  color: i < 13 ? "#7b4dff" : "#ff4d8d",
+                  transitionDelay: `${i * 0.04 + 0.4}s`, 
                   display: 'inline-block'
                 }}
               >
@@ -282,7 +303,7 @@ const Hero = () => {
           
           <motion.p 
             className="description"
-            initial={{ opacity: 0, y: 15 }} // Reduced from y:20
+            initial={{ opacity: 0, y: 15 }}
             animate={{ 
               opacity: 1,
               y: 0,
@@ -291,7 +312,6 @@ const Hero = () => {
                 ease: [0.16, 1, 0.3, 1]
               }
             }}
-            style={{ color: "#c5c5ff" }}
           >
             Crafting digital experiences with clean code and beautiful design
           </motion.p>
@@ -308,6 +328,7 @@ const Hero = () => {
               }
             }}
           >
+            <a href="#work">
             <motion.button
               variants={buttonVariants}
               initial="initial"
@@ -320,19 +341,21 @@ const Hero = () => {
               <div className="button-aura"></div>
               <div className="button-sparkles"></div>
             </motion.button>
-            <a href="#Contact">
-            <motion.button
-              variants={buttonVariants}
-              initial="initial"
-              animate={{ y: 0, opacity: 1, transition: { delay: 1.5 } }} 
-              whileHover="hover"
-              whileTap="tap"
-              className="contact-btn"
-            >
-              <span>📬 Contact Me</span>
-              <div className="button-aura"></div>
-              <div className="button-sparkles"></div>
-            </motion.button>
+            </a>
+
+            <a href="#contact">
+              <motion.button
+                variants={buttonVariants}
+                initial="initial"
+                animate={{ y: 0, opacity: 1, transition: { delay: 1.5 } }} 
+                whileHover="hover"
+                whileTap="tap"
+                className="contact-btn"
+              >
+                <span>📬 Contact Me</span>
+                <div className="button-aura"></div>
+                <div className="button-sparkles"></div>
+              </motion.button>
             </a>
           </motion.div>
         </motion.div>

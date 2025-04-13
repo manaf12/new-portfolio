@@ -1,27 +1,19 @@
-import { useRef, useState, useMemo } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import "./workExperience.scss";
 
 const WorkExperience = () => {
-  const ref = useRef();
   const [activeCompany, setActiveCompany] = useState(0);
-  
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start center", "end center"]
-  });
-
-  const y1 = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const y2 = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const y3 = useTransform(scrollYProgress, [0, 1], ["0%", "70%"]);
+  const [hoveredTech, setHoveredTech] = useState(null);
+  const canvasRef = useRef(null);
 
   const companies = useMemo(() => [
     {
       id: 1,
-      name: "Reparametrize Studio.",
+      name: "Reparametrize Studio",
       position: "IT & AI Department",
       period: "Aug 2024 - Present",
-      logo: "tech-innovators.webp",
+      logo: "FOUNDATION_LOGO_BLACK.png",
       achievements: [
         "Led the full-stack web development of the platform using React (frontend) and PHP Laravel (backend)",
         "Implemented advanced performance optimizations including code splitting, lazy loading, and bundle size reduction",
@@ -31,14 +23,15 @@ const WorkExperience = () => {
         "Optimized AI algorithms for performance and scalability"
       ],
       techStack: ["React.js", "Next.js", "LeafLet.js", "TypeScript", "PHP Laravel", "GitHub", "Python", "ML"],
-      color: "#7b4dff"
+      color: "#7b4dff",
+      accentColor: "#9d7aff"
     },
     {
       id: 2,
-      name: "Fatio Store.",
+      name: "Fatio Store",
       position: "Frontend Developer",
-      period: "Feb 2025 - present",
-      logo: "digital-solutions.webp",
+      period: "Feb 2025 - Present",
+      logo: "Fatio_logo_round.jpg",
       achievements: [
         "Leading the complete redesign and development of Fatio Store",
         "Built a custom Shopify theme from scratch using Liquid, JavaScript, and CSS",
@@ -47,14 +40,15 @@ const WorkExperience = () => {
         "Applied performance best practices including lazy loading and asset minification"
       ],
       techStack: ["JavaScript", "Liquid", "Shopify", "CSS", "Shopify Theme Development", "Figma"],
-      color: "#00c6ff"
+      color: "#00c6ff",
+      accentColor: "#6bdfff"
     },
     {
       id: 3,
       name: "The RUSHIO",
       position: "Web Developer",
-      period: "May 2024-Sep 2024",
-      logo: "webcraft.webp",
+      period: "May 2024 - Sep 2024",
+      logo: "rushio_logo.webp",
       achievements: [
         "Collaborated with cross-functional teams to design and implement user-centric features",
         "Led the integration of third-party APIs and external services",
@@ -63,7 +57,8 @@ const WorkExperience = () => {
         "Developed custom features and components using Liquid and React"
       ],
       techStack: ["React", "JavaScript", "Shopify", "Liquid", "Nodejs", "Figma", "Trello"],
-      color: "#ff4d8d"
+      color: "#ff4d8d",
+      accentColor: "#ff8db3"
     }
   ], []);
 
@@ -87,56 +82,170 @@ const WorkExperience = () => {
     active: {
       backgroundColor: "rgba(123, 77, 255, 0.15)",
       borderColor: "var(--company-color)",
-      boxShadow: "0 10px 25px rgba(123, 77, 255, 0.3)",
       transition: { type: "spring", stiffness: 500 }
+    },
+    techHover: {
+      scale: 1.05,
+      y: -3,
+      backgroundColor: "var(--tech-hover-bg)",
+      transition: { type: "spring", stiffness: 500, damping: 15 }
     }
   }), []);
 
-  const getGradient = (color) => {
-    try {
-      return `linear-gradient(135deg, ${color} 0%, ${lightenColor(color, 20)} 100%)`;
-    } catch {
-      return `linear-gradient(135deg, #7b4dff 0%, #6200ea 100%)`;
+  // Canvas animation for connection lines
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let connections = [];
+
+    // Initialize connections
+    const initConnections = () => {
+      connections = [];
+      const count = 10; // Reduced number of connections
+      for (let i = 0; i < count; i++) {
+        connections.push({
+          x1: Math.random() * canvas.width,
+          y1: Math.random() * canvas.height,
+          x2: Math.random() * canvas.width,
+          y2: Math.random() * canvas.height,
+          speed: 0.2 + Math.random() * 0.5,
+          progress: Math.random(),
+          goingForward: Math.random() > 0.5
+        });
+      }
+    };
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      initConnections();
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = companies[activeCompany].color;
+      ctx.lineWidth = 0.3;
+      ctx.globalAlpha = 0.15;
+
+      connections.forEach(conn => {
+        // Update progress
+        if (conn.goingForward) {
+          conn.progress += conn.speed / 100;
+          if (conn.progress >= 1) conn.goingForward = false;
+        } else {
+          conn.progress -= conn.speed / 100;
+          if (conn.progress <= 0) conn.goingForward = true;
+        }
+
+        // Draw line
+        ctx.beginPath();
+        const x = conn.x1 + (conn.x2 - conn.x1) * conn.progress;
+        const y = conn.y1 + (conn.y2 - conn.y1) * conn.progress;
+        ctx.moveTo(conn.x1, conn.y1);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      });
+
+      animationFrameId = requestAnimationFrame(draw);
+    };
+
+    resizeCanvas();
+    const resizeObserver = new ResizeObserver(resizeCanvas);
+    resizeObserver.observe(canvas);
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      resizeObserver.disconnect();
+    };
+  }, [activeCompany]);
+
+  const getTechDescription = (tech) => {
+    const descriptions = {
+      "React.js": "JavaScript library for building user interfaces",
+      "Next.js": "React framework for server-rendered applications",
+      "LeafLet.js": "Lightweight JavaScript library for interactive maps",
+      "TypeScript": "Typed JavaScript superset for large-scale applications",
+      "PHP Laravel": "PHP framework for web application development",
+      "GitHub": "Platform for version control and collaboration",
+      "Python": "High-level programming language for general purposes",
+      "ML": "Machine Learning algorithms and models",
+      "JavaScript": "Programming language for interactive web pages",
+      "Liquid": "Template language for Shopify themes",
+      "Shopify": "E-commerce platform for online stores",
+      "CSS": "Styling language for web pages",
+      "Shopify Theme Development": "Creating custom themes for Shopify stores",
+      "Figma": "Collaborative interface design tool",
+      "Nodejs": "JavaScript runtime for server-side development",
+      "Trello": "Project management tool"
+    };
+    
+    return descriptions[tech] || "Technology used in project";
+  };
+  const ConnectionLines = () => {
+    const connections = [];
+    const count = 15;
+    
+    for (let i = 0; i < count; i++) {
+      connections.push({
+        id: i,
+        startX: Math.random() * 100,
+        startY: Math.random() * 100,
+        endX: Math.random() * 100,
+        endY: Math.random() * 100,
+        color: companies[activeCompany].color,
+        delay: i * 0.1
+      });
     }
-  };
-
-  const lightenColor = (color, percent) => {
-    if (!color || typeof color !== 'string') return '#6200ea';
     
-    const hex = color.replace('#', '');
-    if (!/^[0-9A-F]{6}$/i.test(hex)) return '#6200ea';
-
-    const num = parseInt(hex, 16);
-    const amt = Math.round(2.55 * percent);
-    
-    const R = Math.min(255, Math.max(0, (num >> 16) + amt));
-    const G = Math.min(255, Math.max(0, (num >> 8 & 0x00FF) + amt));
-    const B = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
-    
-    return `#${(
-      (1 << 24) + (R << 16) + (G << 8) + B
-    ).toString(16).slice(1)}`;
-  };
-
-  return (
-    <section className="work-experience" ref={ref} id="experience">
-      <motion.div className="bg-layer-1" style={{ y: y1 }} />
-      <motion.div className="bg-layer-2" style={{ y: y2 }} />
-      <motion.div className="bg-layer-3" style={{ y: y3 }} />
-
-      <div className="particles">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${Math.random() * 15 + 10}s`
+    return (
+      <svg className="connection-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {connections.map(conn => (
+          <motion.line
+            key={conn.id}
+            x1={conn.startX}
+            y1={conn.startY}
+            x2={conn.endX}
+            y2={conn.endY}
+            stroke={conn.color}
+            strokeWidth="0.3"
+            strokeOpacity="0.15"
+            initial={{ pathLength: 0 }}
+            animate={{ 
+              pathLength: 1,
+              stroke: companies[activeCompany].color
+            }}
+            transition={{
+              duration: 2,
+              delay: conn.delay,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut"
             }}
           />
         ))}
+      </svg>
+    );
+  };
+  return (
+    <section className="work-experience" id="experience">
+      {/* Optimized Background Elements */}
+      <div className="optimized-background">
+      <ConnectionLines />
+        <div className="css-grid-background" />
+        <canvas ref={canvasRef} className="canvas-connections" />
+        <div 
+          className="gradient-overlay" 
+          style={{ background: `radial-gradient(circle at 20% 30%, ${companies[activeCompany].color}20 0%, transparent 50%)` }} 
+        />
+        <div 
+          className="gradient-overlay" 
+          style={{ background: `radial-gradient(circle at 70% 50%, ${companies[activeCompany].accentColor}20 0%, transparent 45%)` }} 
+        />
       </div>
 
       <div className="container">
@@ -147,18 +256,25 @@ const WorkExperience = () => {
           transition={{ duration: 0.6 }}
           viewport={{ once: true, margin: "-50px" }}
         >
-          <motion.h2>
-            <span className="gradient-text">Professional</span> Journey
-          </motion.h2>
-          <motion.p className="subtitle">
+          <h2>
+            <motion.span 
+              className="gradient-text"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Professional
+            </motion.span>{" "}
+            <span>Journey</span>
+          </h2>
+          <motion.p 
+            className="subtitle"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
             Where innovation meets experience
           </motion.p>
-          <motion.div 
-            className="divider"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-          />
         </motion.div>
 
         <div className="experience-container">
@@ -177,12 +293,25 @@ const WorkExperience = () => {
                 viewport={{ once: true, margin: "-30px" }}
                 style={{
                   '--company-color': company.color,
-                  '--company-gradient': getGradient(company.color)
+                  '--company-accent': company.accentColor
                 }}
-                aria-label={`View ${company.name} experience`}
               >
-                <span>{company.name}</span>
-                <motion.div className="active-indicator" />
+                <div className="company-logo-wrapper">
+                  <img 
+                    src={`/${company.logo}`} 
+                    alt={`${company.name} logo`} 
+                    className="company-logo"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'block';
+                    }}
+                  />
+             
+                </div>
+                <div className="company-info">
+                  <span>{company.name}</span>
+                  <small>{company.period}</small>
+                </div>
               </motion.button>
             ))}
           </div>
@@ -195,24 +324,23 @@ const WorkExperience = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              style={{
-                '--company-color': companies[activeCompany]?.color || '#7b4dff'
-              }}
             >
               {companies[activeCompany] && (
                 <>
                   <div className="company-header">
-                    <h3>
-                      <span>{companies[activeCompany].position}</span>
-                      <span className="company-name"> @ {companies[activeCompany].name}</span>
-                    </h3>
-                    <p className="period">
-                      {companies[activeCompany].period}
-                    </p>
+                    <div className="position-period">
+                      <h3>
+                        <span>{companies[activeCompany].position}</span>
+                        <span className="company-name"> @ {companies[activeCompany].name}</span>
+                      </h3>
+                      <p className="period">
+                        {companies[activeCompany].period}
+                      </p>
+                    </div>
                   </div>
 
                   <div className="achievements">
-                    <h4>Key Achievements:</h4>
+                    <h4>Key Achievements</h4>
                     <ul>
                       {companies[activeCompany].achievements.map((item, i) => (
                         <motion.li
@@ -229,16 +357,33 @@ const WorkExperience = () => {
                   </div>
 
                   <div className="tech-stack">
-                    <h4>Technologies Used:</h4>
+                    <h4>Technologies Used</h4>
                     <div className="tech-tags">
                       {companies[activeCompany].techStack.map((tech, i) => (
                         <motion.span
                           key={tech}
+                          className="tech-tag"
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
+                          whileHover="techHover"
+                          variants={variants}
                           transition={{ delay: 0.05 * i + 0.6 }}
+                          onMouseEnter={() => setHoveredTech(tech)}
+                          onMouseLeave={() => setHoveredTech(null)}
+                          style={{
+                            '--tech-hover-bg': companies[activeCompany].accentColor + '22'
+                          }}
                         >
                           {tech}
+                          {hoveredTech === tech && (
+                            <motion.span 
+                              className="tech-tooltip"
+                              initial={{ opacity: 0, y: 5 }}
+                              animate={{ opacity: 1, y: 0 }}
+                            >
+                              {getTechDescription(tech)}
+                            </motion.span>
+                          )}
                         </motion.span>
                       ))}
                     </div>
