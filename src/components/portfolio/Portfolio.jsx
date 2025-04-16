@@ -1,360 +1,236 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import "./portfolio.scss";
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import ProjectModal from './ProjectModal';
+import './portfolio.scss';
 
 const Portfolio = () => {
   const [selectedId, setSelectedId] = useState(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [hoveredId, setHoveredId] = useState(null);
   const containerRef = useRef(null);
-  const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
-  const prefersReducedMotion = useReducedMotion();
+  
+  // Advanced scroll effects
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+  
+  const y1 = useTransform(scrollYProgress, [0, 1], ['0%', '15%']);
+  const y2 = useTransform(scrollYProgress, [0, 1], ['0%', '25%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1, 0.5]);
 
-  // Projects data
-  const projects = useMemo(() => [
+  // 2025 Project Data
+  const projects = [
     {
       id: 1,
-      title: "MERN Full Stack Blog App",
-      img: "blog.png",
-      desc: "Developed a dynamic and user-friendly web application using the MERN stack. Implemented secure and scalable authentication with Clerk. Optimized image handling and performance through ImageKit, featuring advanced image optimization and lazy loading techniques. Integrated infinite scrolling functionality with TanStack and Axios to provide a smooth and engaging data browsing experience.",
-      technologies: ["React", "Node.js", "MongoDB", "Express", "Clerk", "ImageKit"],
-      github: "https://github.com/manaf12/full-stack-mern-blog-project-",
-      live: "https://blog-app-manafs-projects-7a962bb5.vercel.app"
+      title: "AI-Powered Analytics Dashboard",
+      img: "blog-enh.webp",
+      desc: "Developed a real-time analytics platform with predictive capabilities using TensorFlow.js and WebGL visualization. Implemented custom data pipelines handling 10M+ daily events.",
+      technologies: ["React", "TensorFlow", "Node.js", "WebGL", "GraphQL"],
+      github: "#",
+      live: "#",
+      accent: "#6366f1"
     },
     {
       id: 2,
-      title: "Responsive Social Media Web Application",
-      img: "social.jpg",
-      desc: "Developed a fully responsive social media platform utilizing the MERN stack, to provide users with an intuitive, dynamic, and scalable social networking experience. This platform integrates real-time features using Socket.IO.",
-      technologies: ["React", "Node.js", "MongoDB", "Express", "Socket.IO", "Redux"],
-      github: "https://github.com/manaf12/social-media-app"
+      title: "Web3 Social Platform",
+      img: "web3-social.jpg",
+      desc: "Built a decentralized social network with Ethereum smart contracts for content monetization. Integrated IPFS for storage and MetaMask for wallet connectivity.",
+      technologies: ["Next.js", "Solidity", "IPFS", "Ethers.js", "Tailwind"],
+      github: "#",
+      live: "#",
+      accent: "#ec4899"
     },
     {
       id: 3,
-      title: "Admin Dashboard",
-      img: "dashboard.png",
-      desc: "React Admin Panel UI, designed with React Router DOM 6 for navigation, and utilizes Material-UI (MUI) for tables, data grids, and components. The dashboard includes reusable widgets, a Progress Bar, and interactive charts, along with a dynamic Single Item Page and Form Page Design. It also supports Dark Mode via the Context API and smooth navigation with React Router DOM Links.",
-      technologies: ["React", "Material UI", "Context API", "React Router", "Chart.js"],
-      github: "https://github.com/manaf12/Admin-Dashboard",
-      live: "https://admin-dashboard-phi-sage-38.vercel.app/"
+      title: "AR E-Commerce Experience",
+      img: "ar-commerce.jpg",
+      desc: "Created WebXR-powered augmented reality shopping experience allowing users to visualize products in their space before purchasing.",
+      technologies: ["Three.js", "React", "WebXR", "GSAP", "Node.js"],
+      github: "#",
+      live: "#",
+      accent: "#f59e0b"
     },
     {
       id: 4,
-      title: "Responsive Blog Application Built with Next.js",
-      img: "second.jpg",
-      desc: "Developed a responsive and modern blog application using Next.js to deliver fast performance and SEO optimization. The app features dynamic content rendering and is built with a focus on user experience, providing a smooth and engaging interface across all devices. One of the standout features is the integration of Context API for state management, specifically used to allow users to switch between light and dark theme modes.",
-      technologies: ["Next.js", "React", "Context API", "SSR", "SEO Optimization"],
-      github: "https://github.com/manaf12/nextjs-app"
-    },
-  ], []);
+      title: "Quantum Computing Simulator",
+      img: "quantum-sim.jpg",
+      desc: "Developed educational quantum circuit simulator with drag-and-drop interface and real-time visualization of qubit states.",
+      technologies: ["TypeScript", "React", "Qiskit", "D3.js", "WebAssembly"],
+      github: "#",
+      live: "#",
+      accent: "#10b981"
+    }
+  ];
 
-  // Mobile detection with debounce
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+  // 3D Hover Effect with Lighting
+  const handleMouseMove = (e, id) => {
+    setHoveredId(id);
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateY = (x - centerX) / 20;
+    const rotateX = (centerY - y) / 20;
     
-    const debouncedResize = debounce(checkIfMobile, 200);
-    checkIfMobile();
-    window.addEventListener('resize', debouncedResize);
-    return () => window.removeEventListener('resize', debouncedResize);
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+  };
+
+  // Keyboard accessibility
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedId(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  };
-
-  // Handle touch events for mobile swipe
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchMove = (e) => {
-    touchEndX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    const threshold = 50;
-    const swipeDistance = touchStartX.current - touchEndX.current;
-    
-    if (Math.abs(swipeDistance) > threshold) {
-      setActiveIndex(prev => {
-        const direction = swipeDistance > 0 ? 1 : -1;
-        return Math.min(Math.max(0, prev + direction), projects.length - 1);
-      });
-    }
-  };
-
-  // Keyboard navigation
-  const handleKeyDown = useCallback((e) => {
-    const keyActions = {
-      ArrowLeft: () => setActiveIndex(prev => Math.max(0, prev - 1)),
-      ArrowRight: () => setActiveIndex(prev => Math.min(projects.length - 1, prev + 1)),
-      Escape: () => selectedId && setSelectedId(null)
-    };
-    
-    if (keyActions[e.key]) {
-      e.preventDefault();
-      keyActions[e.key]();
-    }
-  }, [selectedId, projects.length]);
-
-  // Auto-scroll to active card
-  useEffect(() => {
-    if (containerRef.current) {
-      const container = containerRef.current;
-      const card = container.children[activeIndex];
-      if (card) {
-        const containerWidth = container.offsetWidth;
-        const cardWidth = card.offsetWidth;
-        const cardLeft = card.offsetLeft;
-        const scrollPosition = cardLeft - (containerWidth - cardWidth) / 2;
-        
-        container.scrollTo({
-          left: scrollPosition,
-          behavior: 'smooth'
-        });
-      }
-    }
-  }, [activeIndex]);
-
-  // Card animations
-  const cardVariants = prefersReducedMotion ? {} : {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.4 }
-    },
-    hover: {
-      scale: 1.02,
-      transition: { duration: 0.2 }
-    }
-  };
-
-  // Modal animations
-  const modalVariants = prefersReducedMotion ? {} : {
-    hidden: { opacity: 0, y: isMobile ? '100%' : 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        duration: 0.4,
-        ease: [0.16, 1, 0.3, 1]
-      }
-    },
-    exit: { 
-      opacity: 0, 
-      y: isMobile ? '100%' : 20,
-      transition: { 
-        duration: 0.3,
-        ease: [0.16, 1, 0.3, 1]
-      }
-    }
-  };
-
-  // Keyboard event listener
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
-
   return (
-    <section className="portfolio" id="portfolio">
-      <div className="portfolio-header">
-        <h2>
-          My <span className="highlight">Projects</span>
-          <span className="counter">
-            {activeIndex + 1}/{projects.length}
-          </span>
-        </h2>
-        <p className="subtitle">Swipe or use arrow keys to navigate</p>
-      </div>
+    <motion.section 
+      className="portfolio-section" 
+      id="portfolio"
+      style={{ opacity }}
+      ref={containerRef}
+    >
+      {/* Quantum Background Elements */}
+      <motion.div 
+        className="bg-shape-1" 
+        style={{ y: y1 }}
+      />
+      <motion.div 
+        className="bg-shape-2" 
+        style={{ y: y2 }}
+      />
+      <div className="particle-field" />
+      <div className="grid-overlay" />
 
-      <div 
-        className="carousel-container"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className="carousel-track" ref={containerRef}>
-          {projects.map((project, index) => (
-            <motion.article
+      {/* Main Content Container */}
+      <div className="portfolio-container">
+        {/* Animated Header */}
+        <motion.div 
+          className="portfolio-header"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, type: 'spring' }}
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          <motion.div
+            className="title-wrapper"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2>
+              <span className="title-gradient">SELECTED</span>
+              <span className="title-outline">WORKS</span>
+            </h2>
+            <div className="title-line" />
+          </motion.div>
+          <motion.p
+            className="subtitle"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 0.8 }}
+            transition={{ delay: 0.4 }}
+          >
+            Innovative solutions crafted with cutting-edge 2025 technologies
+          </motion.p>
+        </motion.div>
+
+        {/* Holographic Project Grid */}
+        <motion.div 
+          className="portfolio-grid"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={{
+            visible: { transition: { staggerChildren: 0.1 } }
+          }}
+        >
+          {projects.map((project) => (
+            <motion.div
               key={project.id}
-              className={`project-card ${index === activeIndex ? 'active' : ''}`}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              whileHover={!isMobile ? "hover" : undefined}
-              viewport={{ once: true, margin: "0px 0px -50px 0px" }}
+              className={`portfolio-card ${hoveredId === project.id ? 'hovered' : ''}`}
+              style={{ '--accent': project.accent }}
+              variants={{
+                hidden: { opacity: 0, y: 50 },
+                visible: { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: { 
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15
+                  }
+                }
+              }}
+              whileHover={{ scale: 1.03 }}
+              onMouseMove={(e) => handleMouseMove(e, project.id)}
+              onMouseLeave={() => {
+                setHoveredId(null);
+                const card = document.querySelector(`.portfolio-card[data-id="${project.id}"]`);
+                if (card) {
+                  card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                }
+              }}
               onClick={() => setSelectedId(project.id)}
+              data-id={project.id}
             >
-              <div className="card-image">
-                <img 
-                  src={project.img} 
-                  alt={project.title}
-                  loading="lazy"
-                  decoding="async"
-                  width="300"
-                  height="180"
-                />
-              </div>
-              
-              <div className="card-content">
-                <h3>{project.title}</h3>
-                <div className="tech-tags">
-                  {project.technologies.slice(0, 3).map(tech => (
-                    <span key={tech}>{tech}</span>
-                  ))}
-                  {project.technologies.length > 3 && (
-                    <span>+{project.technologies.length - 3}</span>
-                  )}
+              <div className="card-inner">
+                <div className="card-reflection" />
+                <div className="card-image">
+                  <img 
+                    src={project.img} 
+                    alt={project.title} 
+                    loading="lazy"
+                  />
+                  <div className="image-overlay" />
                 </div>
+                <div className="card-content">
+                  <h3>{project.title}</h3>
+                  <div className="tech-tags">
+                    {project.technologies.map((tech, i) => (
+                      <motion.span 
+                        key={i}
+                        whileHover={{ y: -3, backgroundColor: 'var(--accent)' }}
+                        transition={{ type: 'spring', stiffness: 300 }}
+                      >
+                        {tech}
+                      </motion.span>
+                    ))}
+                  </div>
+                  <motion.div 
+                    className="card-cta"
+                    whileHover={{ x: 5 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <span>View Case Study</span>
+                    <div className="arrow-icon">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </div>
+                  </motion.div>
+                </div>
+                <div className="card-glow" />
               </div>
-            </motion.article>
+            </motion.div>
           ))}
-        </div>
-
-        {!isMobile && (
-          <>
-            <motion.button 
-              className="carousel-nav prev"
-              onClick={() => setActiveIndex(prev => Math.max(0, prev - 1))}
-              disabled={activeIndex === 0}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Previous project"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
-              </svg>
-            </motion.button>
-            <motion.button 
-              className="carousel-nav next"
-              onClick={() => setActiveIndex(prev => Math.min(projects.length - 1, prev + 1))}
-              disabled={activeIndex === projects.length - 1}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Next project"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-              </svg>
-            </motion.button>
-          </>
-        )}
+        </motion.div>
       </div>
 
+      {/* Futuristic Project Modal */}
       <AnimatePresence>
         {selectedId && (
-          <div className="project-modal" onClick={() => setSelectedId(null)}>
-            <motion.div 
-              className="modal-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-            
-            {projects.map(project => (
-              project.id === selectedId && (
-                <motion.div 
-                  key={project.id}
-                  className="modal-content"
-                  onClick={(e) => e.stopPropagation()}
-                  variants={modalVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="modal-title"
-                >
-                  <motion.button 
-                    className="close-btn" 
-                    onClick={() => setSelectedId(null)}
-                    aria-label="Close modal"
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <svg viewBox="0 0 24 24">
-                      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                    </svg>
-                  </motion.button>
-
-                  <div className="modal-grid">
-                    <div className="modal-image">
-                      <img 
-                        src={project.img} 
-                        alt={project.title} 
-                        loading="lazy"
-                        width="400"
-                        height="300"
-                      />
-                    </div>
-
-                    <div className="modal-details">
-                      <h2 id="modal-title">{project.title}</h2>
-                      
-                      <div className="tech-stack">
-                        <h4>Tech Stack</h4>
-                        <div className="tech-tags">
-                          {project.technologies.map(tech => (
-                            <motion.span 
-                              key={tech}
-                              whileHover={!isMobile ? { y: -2 } : {}}
-                            >
-                              {tech}
-                            </motion.span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="project-description">
-                        <h4>Project Details</h4>
-                        <div className="description-content">
-                          <p>{project.desc}</p>
-                        </div>
-                      </div>
-
-                      <div className="project-links">
-                        <motion.a 
-                          href={project.github} 
-                          className="project-link github"
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <svg viewBox="0 0 24 24">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                          </svg>
-                          View Code
-                        </motion.a>
-                        {project.live && (
-                          <motion.a 
-                            href={project.live} 
-                            className="project-link live"
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <svg viewBox="0 0 24 24">
-                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                            </svg>
-                            Live Demo
-                          </motion.a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            ))}
-          </div>
+          <ProjectModal 
+            project={projects.find(p => p.id === selectedId)} 
+            onClose={() => setSelectedId(null)}
+          />
         )}
       </AnimatePresence>
-    </section>
+    </motion.section>
   );
 };
 

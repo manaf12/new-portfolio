@@ -429,7 +429,7 @@
             position: relative;
             top: 8px;
             flex-shrink: 0;
-            box-shadow: 0 0 15px var(--company-color);
+            box-shadow: 0 0 15px var(--company-color, #7b4dff);
             display: block !important;
           }
     
