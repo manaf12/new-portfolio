@@ -8,7 +8,6 @@ const ProjectModal = ({ project, onClose }) => {
   const [imagesLoaded, setImagesLoaded] = useState([]);
   const modalRef = useRef(null);
 
-  // Image data with proper alt text
   const images = [
     { src: project.img, alt: `${project.title} main screenshot` },
     { src: `/${project.id}-feature.webp`, alt: `${project.title} feature close-up` },
@@ -18,6 +17,18 @@ const ProjectModal = ({ project, onClose }) => {
   const handleImageLoad = (index) => {
     setImagesLoaded(prev => [...prev, index]);
   };
+
+  // Close modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
 
   // Parallax effect
   useEffect(() => {
@@ -70,10 +81,11 @@ const ProjectModal = ({ project, onClose }) => {
         <motion.div 
           className="modal-container"
           ref={modalRef}
-          initial={{ y: 50, opacity: 0 }}
+          initial={{ y: 50, opacity: 0, scale: 0.95 }}
           animate={{ 
             y: 0, 
-            opacity: 1,
+            opacity: 1, 
+            scale: 1,
             transition: { 
               type: "spring",
               damping: 25,
