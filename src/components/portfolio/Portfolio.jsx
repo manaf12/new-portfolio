@@ -36,6 +36,9 @@ const Portfolio = () => {
       img:"landingpage.jpg",
       desc:"Designed and developed a fully responsive website featuring sleek parallax scrolling effects and a visually engaging bento box layout. This project showcases my ability to craft modern, stylish user interfaces while applying mobile-first design principles. Built using React.js and Tailwind CSS, it demonstrates strong frontend skills, smooth animations, and component-based architecture.",
       technologies: ["React , React Router , Tailwind CSS, scroll-lock,react-just-parallax"],
+      github:"https://github.com/manaf12/LandingPage",
+      live:"https://landing-page-eight-inky-25.vercel.app/",
+      
     },
     {
       id: 3,
