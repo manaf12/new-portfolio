@@ -24,23 +24,30 @@ const Portfolio = () => {
       id: 1,
       title: "MERN Full Stack Blog App",
       img: "blog-enh.webp",
-      desc: "Developed a dynamic and user-friendly web application using the MERN stack. Implemented secure and scalable authentication with Clerk. Optimized image handling and performance through ImageKit, featuring advanced image optimization and lazy loading techniques. Integrated infinite scrolling functionality with TanStack and Axios to provide a smooth and engaging data browsing experience.",      technologies: ["React", "TensorFlow", "Node.js", "WebGL", "GraphQL"],
+      desc: "Developed a dynamic and user-friendly web application using the MERN stack. Implemented secure and scalable authentication with Clerk. Optimized image handling and performance through ImageKit, featuring advanced image optimization and lazy loading techniques. Integrated infinite scrolling functionality with TanStack and Axios to provide a smooth and engaging data browsing experience.",    
       technologies: ["React", "Node.js", "MongoDB", "Express", "Clerk", "ImageKit"],
       github:"https://github.com/manaf12/full-stack-mern-blog-project-",
       live: "https://blog-app-manafs-projects-7a962bb5.vercel.app",
       accent: "#6366f1"
     },
     {
-      id: 2,
+      id:2,
+      title:"Modern Landing Page",
+      img:"landingpage.jpg",
+      desc:"Designed and developed a fully responsive website featuring sleek parallax scrolling effects and a visually engaging bento box layout. This project showcases my ability to craft modern, stylish user interfaces while applying mobile-first design principles. Built using React.js and Tailwind CSS, it demonstrates strong frontend skills, smooth animations, and component-based architecture.",
+      technologies: ["React , React Router , Tailwind CSS, scroll-lock,react-just-parallax"],
+    },
+    {
+      id: 3,
       title: "Responsive Social Media Web Application",
       img: "social.jpg",
-desc: "Developed a fully responsive social media platform utilizing the MERN stack, to provide users with an intuitive, dynamic, and scalable social networking experience. ",     technologies: ["Next.js", "Solidity", "IPFS", "Ethers.js", "Tailwind"],
+desc: "Developed a fully responsive social media platform utilizing the MERN stack, to provide users with an intuitive, dynamic, and scalable social networking experience. ",  
   technologies: ["React", "Node.js", "MongoDB", "Express", "Socket.IO", "Redux"],
       github: "https://github.com/manaf12/social-media-app",
       accent: "#ec4899"
     },
     {
-      id: 3,
+      id: 4,
       title: "Admin Dashboard",
       img: "dashboard.png",
       desc: "React Admin Panel UI, designed with React Router DOM 6 for navigation, and utilizes Material-UI (MUI) for tables, data grids, and components. The dashboard includes reusable widgets, a Progress Bar, and interactive charts, along with a dynamic Single Item Page and Form Page Design. It also supports Dark Mode via the Context API and smooth navigation with React Router DOM Links.",
@@ -50,7 +57,7 @@ desc: "Developed a fully responsive social media platform utilizing the MERN sta
       accent: "#f59e0b"
     },
     {
-      id: 4,
+      id: 5,
       title: "Responsive Blog Application Built with Next.js",
       img: "second.jpg",
       desc: "Developed a responsive and modern blog application using Next.js to deliver fast performance and SEO optimization. The app features dynamic content rendering and is built with a focus on user experience, providing a smooth and engaging interface across all devices. One of the standout features is the integration of Context API for state management, specifically used to allow users to switch between light and dark theme modes.",
