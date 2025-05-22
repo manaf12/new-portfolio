@@ -6,7 +6,7 @@ const Hero = () => {
   const controls = useAnimation();
   const heroRef = useRef(null);
   const title = "Manaf Alsaoub".split("");
-  const subtitle = "Web Developer & UI Designer".split("");
+  const subtitle = "Web Developer & AI Specialist".split("");
 
   // Throttle function for performance
   const throttle = (func, limit) => {

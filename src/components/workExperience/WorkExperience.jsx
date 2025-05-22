@@ -15,19 +15,46 @@ const WorkExperience = () => {
       period: "Aug 2024 - Present",
       logo: "FOUNDATION_LOGO_BLACK.png",
       achievements: [
-        "Led the full-stack web development of the platform using React (frontend) and PHP Laravel (backend)",
-        "Implemented advanced performance optimizations including code splitting, lazy loading, and bundle size reduction",
-        "Used Leaflet.js to build interactive, multi-layered map visualizations with real-time geospatial overlays",
-        "Facilitated clean, modular code architecture, CI/CD pipelines, and Git-based workflows",
-        "Conducted in-depth research on critical aspects of rebuilding Syria",
-        "Optimized AI algorithms for performance and scalability"
+        "Led full-stack development of the platform using React (frontend) and Python fast-api (backend), integrating AI-driven features to enhance functionality",
+        "Integrated Kepler.gl to deliver advanced, interactive geospatial visualizations supporting AI-powered data analysis and real-time insights",
+"Optimized AI algorithms for performance and scalability, enabling efficient processing of complex geospatial and socioeconomic data",
+        "Implemented frontend performance enhancements such as code splitting, lazy loading, and bundle size reduction to support seamless AI-driven user experiences",
+"Conducted in-depth research on critical aspects of rebuilding Syria",
+        "Designed clean, modular code architecture and established CI/CD pipelines to ensure reliable deployment of AI-integrated applications"
       ],
-      techStack: ["React.js", "Next.js", "LeafLet.js", "TypeScript", "PHP Laravel", "GitHub", "Python", "ML"],
+      techStack: ["React.js", "Next.js", "kepler.gl", "TypeScript","Redux" ,"GitHub", "Python", "ML"],
       color: "#7b4dff",
       accentColor: "#9d7aff"
     },
     {
-      id: 2,
+  id: 2,
+  name: "Yasmin AI",
+  position: "Backend Developer",
+  period: "Remote — Present",
+  logo: "YASMIN_AI_LOGO.png",
+  achievements: [
+    "Developing robust backend systems using Django framework for AI-powered applications",
+    "Implementing JWT authentication for secure API endpoints and user management",
+    "Building data processing pipelines using TensorFlow's scatter and gather operations",
+    "Optimizing PyTorch models for production deployment and seamless integration with Django backend",
+    "Collaborating with cross-functional teams to integrate ML models with web applications",
+    "Contributing to code reviews and implementing best practices for backend development",
+    "Enhancing system performance through efficient database queries and caching strategies"
+  ],
+  techStack: [
+    "Django",
+    "Python",
+    "TensorFlow",
+    "PyTorch",
+    "JWT",
+    "REST APIs",
+    "ML"
+  ],
+  color: "#34a853",
+  accentColor: "#81c784"
+},
+    {
+      id: 3,
       name: "Fatio Store",
       position: "Frontend Developer",
       period: "Feb 2025 - Present",
@@ -44,7 +71,7 @@ const WorkExperience = () => {
       accentColor: "#6bdfff"
     },
     {
-      id: 3,
+      id: 4,
       name: "The RUSHIO",
       position: "Web Developer",
       period: "May 2024 - Sep 2024",
